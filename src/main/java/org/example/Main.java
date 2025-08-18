@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         JFrame jFrame=new JFrame();
         jFrame.setBounds(0,0,740,416);
-        jFrame.add(new StartingScreen(0,0,740,416));
+        jFrame.add(new ManualScreen(0,0,740,416));
         jFrame.setLayout(null);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
