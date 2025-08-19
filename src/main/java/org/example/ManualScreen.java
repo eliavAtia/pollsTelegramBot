@@ -88,7 +88,7 @@ public class ManualScreen extends JPanel {
         addQuestionButton.setBounds(getWidth()/2-180,260,200,120);
         this.add(addQuestionButton);
         ImageButton sendPoll=new ImageButton("/Images/sendPOll.png");
-        sendPoll.setBounds(getWidth()/2+20,260,200,120);
+        sendPoll.setBounds(getWidth()/2+20,290,130,60);
         this.add(sendPoll);
     }
 }
