@@ -24,12 +24,9 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.usersChatIds = new ArrayList<>();
         this.polls = new ArrayList<>();
         this.pollOn = false;
-        LinkedHashMap<String, LinkedHashMap<String,Integer>> questions = new LinkedHashMap<>();
-        questions.put("hello", new LinkedHashMap<>(Map.of("1", 1, "3", 3)));
-        questions.put("hello2", new LinkedHashMap<>(Map.of("11", 11, "12", 12, "13", 13)));
-        questions.put("hello3", new LinkedHashMap<>(Map.of("21", 21, "22", 22)));
-        Poll poll = new Poll(1);
-        poll.setQuestions(questions);
+        Poll poll = new Poll();
+        poll.setDelayTimeSeconds(1);
+        poll.updateDelay();
         polls.add(poll);
         executePoll();
     }
@@ -67,10 +64,22 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     private void checkAnswers(Update update){
-        CallbackQuery callbackQuery = update.getCallbackQuery();
-        String answer = callbackQuery.getData();
+        CallbackQuery callback = update.getCallbackQuery();
+        long chatId = callback.getFrom().getId();
+        String data = callback.getData();
+        String[] parts = data.split(":");
+        int questionId = Integer.parseInt(parts[0]);
+        int optionId = Integer.parseInt(parts[1]);
+        Question question = currentPoll.getQuestions().stream()
+                .filter(q -> q.getId() == questionId)
+                .findFirst()
+                .orElse(null);
+        if(question != null) {
+            boolean notVoted = question.addVote(optionId, chatId);
+            if (!notVoted) {
 
-
+            }
+        }
     }
 
 
@@ -155,30 +164,28 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     public void createAndSendPoll(Poll poll){
-        Map<String, LinkedHashMap<String,Integer>> questions = poll.getQuestions();
-        int questionNum = 1;
-        for(Map.Entry<String, LinkedHashMap<String,Integer>> entry: questions.entrySet()){
+        for(Question question : poll.getQuestions()){
             List<InlineKeyboardButton> buttons = new ArrayList<>();
-            for(String option:entry.getValue().keySet()){
-                buttons.add(createButton(option,questionNum));
+            int questionId = question.getId();
+            for(Option option: question.getOptions()){
+                buttons.add(createButton(option,questionId));
             }
             List<List<InlineKeyboardButton>> keyBoard = new ArrayList<>();
             keyBoard.add(buttons);
             InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
             inlineKeyboardMarkup.setKeyboard(keyBoard);
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setText(entry.getKey());
+            sendMessage.setText(question.getQuestion());
             sendMessage.setReplyMarkup(inlineKeyboardMarkup);
             for (Long usersChatId : usersChatIds) {
                 sendMessageWithPoll(sendMessage, usersChatId);
             }
-            questionNum++;
         }
     }
 
-    private InlineKeyboardButton createButton(String option, int questionNum){
-        InlineKeyboardButton button = new InlineKeyboardButton(option);
-        button.setCallbackData("Q"+questionNum+":"+option);
+    private InlineKeyboardButton createButton(Option option,int questionId){
+        InlineKeyboardButton button = new InlineKeyboardButton(option.getOption());
+        button.setCallbackData(questionId+":"+option.getId());
         return button;
     }
 

@@ -7,26 +7,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Poll {
-    private LinkedHashMap<String, LinkedHashMap<String,Integer>> questions;
+    private List<Question> questions;
     private int delayTimeSeconds;
     private boolean pollReady;
 
-    public Poll(int delayTimeMinutes) {
+
+    public void setDelayTimeSeconds(int delayTimeMinutes) {
         this.delayTimeSeconds = delayTimeMinutes*60;
-        if(delayTimeSeconds==0){
-            pollReady = true;
-        }
-        else {
-            pollReady=false;
-            updateDelay();
-        }
     }
 
     public boolean isPollReady() {
         return pollReady;
     }
 
-    private void updateDelay(){
+    public void updateDelay(){
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             if(delayTimeSeconds>0){
@@ -39,11 +33,11 @@ public class Poll {
         }, 1, 1, TimeUnit.SECONDS);
     }
 
-    public LinkedHashMap<String, LinkedHashMap<String, Integer>> getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(LinkedHashMap<String, LinkedHashMap<String, Integer>> questions) {
+    public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
 }
