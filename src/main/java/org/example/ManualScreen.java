@@ -13,7 +13,9 @@ public class ManualScreen extends JPanel {
     private JLabel questionText;
     private int currentAmountOfAnsweres;
     private int clicked=0;
-    public ManualScreen(int x,int y,int width,int height){
+    private Poll poll;
+    private JFrame parentWindow;
+    public ManualScreen(int x,int y,int width,int height,JFrame parentWindow){
         this.setBounds(x,y,width,height);
         this.image=new ImageIcon(getClass().getResource("/Images/background.png")).getImage();
         this.setVisible(true);
@@ -21,6 +23,7 @@ public class ManualScreen extends JPanel {
         labelsBuilder();
         textAreasBuilder();
         buttonsBuilder();
+        this.parentWindow=parentWindow;
     }
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
@@ -57,7 +60,7 @@ public class ManualScreen extends JPanel {
     }
     public JTextArea answerArea(){
         currentAmountOfAnsweres++;
-        JTextArea answerArea=new JTextArea();
+        JTextArea answerArea;
         answerArea=new JTextArea();
         answerArea.setFont(new Font("Aharoni", Font.PLAIN, 18));
         answerArea.setForeground(Color.black);// צבע טקסט
@@ -87,8 +90,9 @@ public class ManualScreen extends JPanel {
         ImageButton addQuestionButton=new ImageButton("/Images/addQuestion.png");
         addQuestionButton.setBounds(getWidth()/2-180,260,200,120);
         this.add(addQuestionButton);
-        ImageButton sendPoll=new ImageButton("/Images/sendPOll.png");
-        sendPoll.setBounds(getWidth()/2+20,290,130,60);
-        this.add(sendPoll);
+        ImageButton continueButton=new ImageButton("/Images/continue.png");
+        continueButton.setBounds(getWidth()/2+10,250,145,145);
+        this.add(continueButton);
     }
+
 }

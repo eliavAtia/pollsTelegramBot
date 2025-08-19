@@ -7,8 +7,9 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         JFrame jFrame=new JFrame();
+    jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.setBounds(0,0,740,416);
-        jFrame.add(new ManualScreen(0,0,740,416));
+        jFrame.add(new StartingScreen(0,0,740,416,jFrame));
         jFrame.setLayout(null);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
