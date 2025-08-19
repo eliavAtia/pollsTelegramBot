@@ -10,10 +10,18 @@ public class Poll {
     private List<Question> questions;
     private int delayTimeSeconds;
     private boolean pollReady;
+    private long chatId;
 
+    public Poll(long chatId) {
+        this.chatId = chatId;
+        pollReady=false;
+    }
 
     public void setDelayTimeSeconds(int delayTimeMinutes) {
         this.delayTimeSeconds = delayTimeMinutes*60;
+        if(this.delayTimeSeconds==0){
+            pollReady=true;
+        }
     }
 
     public boolean isPollReady() {

@@ -5,6 +5,10 @@ public class Option {
     private String option;
     private int id;
 
+    public Option(int id) {
+        this.id = id;
+    }
+
     public int getVotes() {
         return votes;
     }

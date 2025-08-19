@@ -8,10 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TelegramBot extends TelegramLongPollingBot{
     private List<Long> usersChatIds;
@@ -24,9 +21,43 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.usersChatIds = new ArrayList<>();
         this.polls = new ArrayList<>();
         this.pollOn = false;
-        Poll poll = new Poll();
-        poll.setDelayTimeSeconds(1);
+        Poll poll = new Poll(1);
+        // אופציות לשאלה 1
+        Option red = new Option(1); red.setOption("אדום");
+        Option blue = new Option(2); blue.setOption("כחול");
+        Option green = new Option(3); green.setOption("ירוק");
+        Question q1 = new Question();
+        q1.setId(1);
+        q1.setQuestion("איזה צבע אתה אוהב?");
+        q1.setOptions(Arrays.asList(red, blue, green));
+
+        // אופציות לשאלה 2
+        Option cat = new Option(1); cat.setOption("חתול");
+        Option dog = new Option(2); dog.setOption("כלב");
+        Option fish = new Option(3); fish.setOption("דג");
+
+        Question q2 = new Question();
+        q2.setId(2);
+        q2.setQuestion("איזה חיה אתה אוהב?");
+        q2.setOptions(Arrays.asList(cat, dog, fish));
+
+        // אופציות לשאלה 3
+        Option pizza = new Option(1); pizza.setOption("פיצה");
+        Option burger = new Option(2); burger.setOption("בורגר");
+        Option salad = new Option(3); salad.setOption("סלט");
+        Question q3 = new Question();
+        q3.setId(3);
+        q3.setQuestion("מה הארוחה האהובה עליך?");
+        q3.setOptions(Arrays.asList(pizza, burger, salad));
+
+        // הוספת כל השאלות לסקר
+        List<Question> questions = Arrays.asList(q1, q2, q3);
+        poll.setQuestions(questions);
+
+        // אפשר גם להגדיר זמן סיום לסקר אם רוצים
+        poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
         poll.updateDelay();
+
         polls.add(poll);
         executePoll();
     }
@@ -77,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         if(question != null) {
             boolean notVoted = question.addVote(optionId, chatId);
             if (!notVoted) {
-
+                sendMessage("You have already voted, you cannot vote again.",chatId);
             }
         }
     }
