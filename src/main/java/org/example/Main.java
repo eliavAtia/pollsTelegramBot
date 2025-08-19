@@ -1,5 +1,9 @@
 package org.example;
 
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
 import javax.swing.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -7,12 +11,19 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         JFrame jFrame=new JFrame();
-    jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.setBounds(0,0,740,416);
         jFrame.add(new StartingScreen(0,0,740,416,jFrame));
         jFrame.setLayout(null);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
         jFrame.setResizable(false);
+
+        try {
+            TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
+            api.registerBot(new TelegramBot());
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

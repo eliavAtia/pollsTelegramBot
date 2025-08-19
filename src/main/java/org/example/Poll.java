@@ -24,10 +24,6 @@ public class Poll {
         }
     }
 
-    public boolean isPollReady() {
-        return pollReady;
-    }
-
     public void updateDelay(){
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
@@ -41,6 +37,10 @@ public class Poll {
         }, 1, 1, TimeUnit.SECONDS);
     }
 
+    public boolean isPollReady() {
+        return pollReady;
+    }
+
     public List<Question> getQuestions() {
         return questions;
     }
@@ -48,4 +48,5 @@ public class Poll {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
+
 }

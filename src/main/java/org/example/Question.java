@@ -11,6 +11,29 @@ public class Question {
     private Set<Long> answeredUsers = new HashSet<>();
 
 
+    public Question(int id) {
+        this.id = id;
+    }
+
+    public boolean addVote(int optionId, long chatId) {
+        if(answeredUsers.contains(chatId)){
+            return false;
+        }
+        answeredUsers.add(chatId);
+        Option option = options.stream()
+                .filter(o -> o.getId() == optionId)
+                .findFirst()
+                .orElse(null);
+        if(option != null){
+            option.addVote();
+        }
+        return true;
+    }
+
+    public Set<Long> getAnsweredUsers() {
+        return answeredUsers;
+    }
+
     public String getQuestion() {
         return question;
     }
@@ -31,22 +54,4 @@ public class Question {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public boolean addVote(int optionId, long chatId) {
-        if(answeredUsers.contains(chatId)){
-            return false;
-        }
-        answeredUsers.add(chatId);
-        Option option = options.stream()
-                .filter(o -> o.getId() == optionId)
-                .findFirst()
-                .orElse(null);
-        if(option != null){
-            option.addVote();
-        }
-        return true;
-    }
 }

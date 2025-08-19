@@ -16,18 +16,18 @@ public class TelegramBot extends TelegramLongPollingBot{
     private List<Poll> polls;
     private Poll currentPoll;
 
-
+    //בנאי
     public TelegramBot() {
         this.usersChatIds = new ArrayList<>();
         this.polls = new ArrayList<>();
         this.pollOn = false;
+        this.currentPoll=null;
         Poll poll = new Poll(1);
         // אופציות לשאלה 1
         Option red = new Option(1); red.setOption("אדום");
         Option blue = new Option(2); blue.setOption("כחול");
         Option green = new Option(3); green.setOption("ירוק");
-        Question q1 = new Question();
-        q1.setId(1);
+        Question q1 = new Question(1);
         q1.setQuestion("איזה צבע אתה אוהב?");
         q1.setOptions(Arrays.asList(red, blue, green));
 
@@ -36,8 +36,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         Option dog = new Option(2); dog.setOption("כלב");
         Option fish = new Option(3); fish.setOption("דג");
 
-        Question q2 = new Question();
-        q2.setId(2);
+        Question q2 = new Question(2);
         q2.setQuestion("איזה חיה אתה אוהב?");
         q2.setOptions(Arrays.asList(cat, dog, fish));
 
@@ -45,8 +44,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         Option pizza = new Option(1); pizza.setOption("פיצה");
         Option burger = new Option(2); burger.setOption("בורגר");
         Option salad = new Option(3); salad.setOption("סלט");
-        Question q3 = new Question();
-        q3.setId(3);
+        Question q3 = new Question(3);
         q3.setQuestion("מה הארוחה האהובה עליך?");
         q3.setOptions(Arrays.asList(pizza, burger, salad));
 
@@ -62,6 +60,8 @@ public class TelegramBot extends TelegramLongPollingBot{
         executePoll();
     }
 
+
+    //פונקציות בסיס
     @Override
     public String getBotUsername() {
         return "@poll32_bot";
@@ -72,7 +72,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
-
+    //פונקצית onUpdateReceived
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
@@ -94,26 +94,8 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    private void checkAnswers(Update update){
-        CallbackQuery callback = update.getCallbackQuery();
-        long chatId = callback.getFrom().getId();
-        String data = callback.getData();
-        String[] parts = data.split(":");
-        int questionId = Integer.parseInt(parts[0]);
-        int optionId = Integer.parseInt(parts[1]);
-        Question question = currentPoll.getQuestions().stream()
-                .filter(q -> q.getId() == questionId)
-                .findFirst()
-                .orElse(null);
-        if(question != null) {
-            boolean notVoted = question.addVote(optionId, chatId);
-            if (!notVoted) {
-                sendMessage("You have already voted, you cannot vote again.",chatId);
-            }
-        }
-    }
 
-
+    //פונקציות לבדיקת הודעה רגילה וצירוף לקהילה
     private void checkMessage(Update update){
         String message = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
@@ -148,7 +130,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
-
+    //פונקציות ליצירת סקר
     private void addPoll(Update update){
         long chatId = update.getMessage().getChatId();
         if(usersChatIds.size()<3){
@@ -161,8 +143,6 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
 
     }
-
-
 
     private void executePoll(){
         new Thread(()->{
@@ -177,7 +157,11 @@ public class TelegramBot extends TelegramLongPollingBot{
                     createAndSendPoll(currentPoll);
                     pollOn = true;
                     sleep(50000);
-                    currentPoll = null;
+                    if(currentPoll!=null){
+                        sendAnswersOfPoll();
+                        pollOn=false;
+                        currentPoll=null;
+                    }
                 }
                 else {
                     sleep(1000);
@@ -229,5 +213,45 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
+
+    //פונקציות לבדיקת תשובות
+    private void checkAnswers(Update update){
+        CallbackQuery callback = update.getCallbackQuery();
+        long chatId = callback.getFrom().getId();
+        String data = callback.getData();
+        String[] parts = data.split(":");
+        int questionId = Integer.parseInt(parts[0]);
+        int optionId = Integer.parseInt(parts[1]);
+        Question question = currentPoll.getQuestions().stream()
+                .filter(q -> q.getId() == questionId)
+                .findFirst()
+                .orElse(null);
+        if(question != null) {
+            boolean notVoted = question.addVote(optionId, chatId);
+            if (!notVoted) {
+                sendMessage("You have already voted, you cannot vote again.",chatId);
+            }
+        }
+        checkIfPollOver();
+    }
+
+    private void checkIfPollOver(){
+        boolean pollOver = true;
+        for(Question question: currentPoll.getQuestions()){
+            if (question.getAnsweredUsers().size() != usersChatIds.size()) {
+                pollOver = false;
+                break;
+            }
+        }
+        if(pollOver){
+            sendAnswersOfPoll();
+            pollOn=false;
+            currentPoll=null;
+        }
+    }
+
+    private void sendAnswersOfPoll(){
+
+    }
 
 }
