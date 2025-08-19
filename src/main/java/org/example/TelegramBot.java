@@ -2,6 +2,7 @@ package org.example;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -16,16 +17,17 @@ public class TelegramBot extends TelegramLongPollingBot{
     private List<Long> usersChatIds;
     private boolean pollOn;
     private List<Poll> polls;
+    private Poll currentPoll;
 
 
     public TelegramBot() {
         this.usersChatIds = new ArrayList<>();
         this.polls = new ArrayList<>();
         this.pollOn = false;
-        LinkedHashMap<String, List<String>> questions = new LinkedHashMap<>();
-        questions.put("hello",List.of("1","2","3","3"));
-        questions.put("hello2",List.of("11","12","13"));
-        questions.put("hello3",List.of("21","22","23"));
+        LinkedHashMap<String, LinkedHashMap<String,Integer>> questions = new LinkedHashMap<>();
+        questions.put("hello", new LinkedHashMap<>(Map.of("1", 1, "3", 3)));
+        questions.put("hello2", new LinkedHashMap<>(Map.of("11", 11, "12", 12, "13", 13)));
+        questions.put("hello3", new LinkedHashMap<>(Map.of("21", 21, "22", 22)));
         Poll poll = new Poll(1);
         poll.setQuestions(questions);
         polls.add(poll);
@@ -45,8 +47,12 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     @Override
     public void onUpdateReceived(Update update) {
-        checkMessage(update);
-
+        if (update.hasCallbackQuery()) {
+            checkAnswers(update);
+        }
+        else if (update.hasMessage() && update.getMessage().hasText()) {
+            checkMessage(update);
+        }
     }
 
     private void sendMessage(String message,long chatId){
@@ -59,6 +65,14 @@ public class TelegramBot extends TelegramLongPollingBot{
             throw new RuntimeException(e);
         }
     }
+
+    private void checkAnswers(Update update){
+        CallbackQuery callbackQuery = update.getCallbackQuery();
+        String answer = callbackQuery.getData();
+
+
+    }
+
 
     private void checkMessage(Update update){
         String message = update.getMessage().getText();
@@ -113,17 +127,17 @@ public class TelegramBot extends TelegramLongPollingBot{
     private void executePoll(){
         new Thread(()->{
             while (true){
-                Poll poll = null;
                 for (Poll value : polls) {
                     if (value.isPollReady()) {
-                        poll = value;
+                        currentPoll = value;
                     }
                 }
-                polls.remove(poll);
-                if(poll!=null){
-                    createAndSendPoll(poll);
+                polls.remove(currentPoll);
+                if(currentPoll!=null){
+                    createAndSendPoll(currentPoll);
                     pollOn = true;
                     sleep(50000);
+                    currentPoll = null;
                 }
                 else {
                     sleep(1000);
@@ -141,11 +155,11 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     public void createAndSendPoll(Poll poll){
-        Map<String, List<String>> questions = poll.getQuestions();
+        Map<String, LinkedHashMap<String,Integer>> questions = poll.getQuestions();
         int questionNum = 1;
-        for(Map.Entry<String,List<String>> entry: questions.entrySet()){
+        for(Map.Entry<String, LinkedHashMap<String,Integer>> entry: questions.entrySet()){
             List<InlineKeyboardButton> buttons = new ArrayList<>();
-            for(String option:entry.getValue()){
+            for(String option:entry.getValue().keySet()){
                 buttons.add(createButton(option,questionNum));
             }
             List<List<InlineKeyboardButton>> keyBoard = new ArrayList<>();
@@ -164,8 +178,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private InlineKeyboardButton createButton(String option, int questionNum){
         InlineKeyboardButton button = new InlineKeyboardButton(option);
-        button.setCallbackData("q"+questionNum+":;"+
-                option);
+        button.setCallbackData("Q"+questionNum+":"+option);
         return button;
     }
 
