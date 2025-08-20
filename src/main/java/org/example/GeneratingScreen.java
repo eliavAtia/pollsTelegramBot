@@ -37,6 +37,7 @@ public class GeneratingScreen extends JPanel {
     }
 
     public void stop() {
+
         running = false; // עוצר את הלופ
     }
     public void paintComponent(Graphics g){

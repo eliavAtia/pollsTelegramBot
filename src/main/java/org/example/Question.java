@@ -11,7 +11,6 @@ public class Question {
     private Set<Long> answeredUsers = new HashSet<>();
 
 
-
     public boolean addVote(String optionText, long chatId) {
         if(answeredUsers.contains(chatId)){
             return false;

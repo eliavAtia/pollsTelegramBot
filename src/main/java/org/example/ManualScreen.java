@@ -2,7 +2,8 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
-
+import java.util.ArrayList;
+import java.util.List;
 public class ManualScreen extends JPanel {
     private Image image;
     private JTextArea questionArea;
@@ -15,7 +16,8 @@ public class ManualScreen extends JPanel {
     private int clicked=0;
     private Poll poll;
     private JFrame parentWindow;
-    public ManualScreen(int x,int y,int width,int height,JFrame parentWindow){
+    private List<JTextArea> jTextAreaList;
+    public ManualScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll){
         this.setBounds(x,y,width,height);
         this.image=new ImageIcon(getClass().getResource("/Images/background.png")).getImage();
         this.setVisible(true);
@@ -24,6 +26,7 @@ public class ManualScreen extends JPanel {
         textAreasBuilder();
         buttonsBuilder();
         this.parentWindow=parentWindow;
+        this.poll=poll;
     }
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
@@ -40,6 +43,7 @@ public class ManualScreen extends JPanel {
         this.answer2=answerArea();
         this.answer3=answerArea();
         this.answer4=answerArea();
+        jTextAreaList=List.of(answer1,answer2);
         add(answer1);
         add(answer2);
 
@@ -76,9 +80,11 @@ public class ManualScreen extends JPanel {
             System.out.println(clicked);
             if (clicked==0){
             this.add(answer3);
+            jTextAreaList.add(answer3);
             repaint();
             } else if (clicked==1) {
                 this.add(answer4);
+                jTextAreaList.add(answer4);
                 repaint();
             }
             else {
@@ -90,9 +96,44 @@ public class ManualScreen extends JPanel {
         ImageButton addQuestionButton=new ImageButton("/Images/addQuestion.png");
         addQuestionButton.setBounds(getWidth()/2-180,260,200,120);
         this.add(addQuestionButton);
+        addQuestionButton.addActionListener(e->{
+            if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
+                return;
+            }
+            buttonPressed();
+            ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll);
+            parentWindow.remove(this);
+            parentWindow.add(manualScreen);
+            parentWindow.revalidate();
+            parentWindow.repaint();
+        });
         ImageButton continueButton=new ImageButton("/Images/continue.png");
         continueButton.setBounds(getWidth()/2+10,250,145,145);
         this.add(continueButton);
     }
-
+    private Option newOption(String option){
+        Option option1=new Option();
+        option1.setOption(option);
+        return option1;
+    }
+    public void buttonPressed(){
+        List<Option> optionList=new ArrayList<>();
+        int answers=0;
+        for (JTextArea jTextArea:jTextAreaList){
+            if (jTextArea.getText() != null) {
+                optionList.add(newOption(jTextArea.getText()));
+                answers++;
+            }
+        }
+        if (answers<2){
+            return;
+        }
+        Question question=new Question();
+        question.setQuestion(questionArea.getText());
+        if (questionArea.getText()==null){
+            return;
+        }
+        question.setOptions(optionList);
+        poll.addQuestion(question);
+    }
 }

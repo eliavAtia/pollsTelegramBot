@@ -24,7 +24,8 @@ public class StartingScreen extends JPanel {
         manualImg.setBounds(200, 150, 120, 80); // x, y, width, height
         manualImg.addActionListener(e -> {
             System.out.println("Manual clicked!");
-            ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow);
+            Poll poll=new Poll();
+            ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll);
             parentWindow.remove(this);
             parentWindow.add(manualScreen);
             parentWindow.revalidate();

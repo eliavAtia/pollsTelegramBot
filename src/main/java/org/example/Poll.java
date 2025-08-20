@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -13,6 +14,7 @@ public class Poll {
 
 
     public Poll() {
+        questions=new ArrayList<>();
         pollReady=false;
     }
 
@@ -47,5 +49,10 @@ public class Poll {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
-
+    public void addQuestion(Question question){
+        this.questions.add(question);
+    }
+    public String toString(){
+        return questions.toString();
+    }
 }
