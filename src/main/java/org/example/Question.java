@@ -11,17 +11,14 @@ public class Question {
     private Set<Long> answeredUsers = new HashSet<>();
 
 
-    public Question(int id) {
-        this.id = id;
-    }
 
-    public boolean addVote(int optionId, long chatId) {
+    public boolean addVote(String optionText, long chatId) {
         if(answeredUsers.contains(chatId)){
             return false;
         }
         answeredUsers.add(chatId);
         Option option = options.stream()
-                .filter(o -> o.getId() == optionId)
+                .filter(o -> o.toString().equals(optionText))
                 .findFirst()
                 .orElse(null);
         if(option != null){
@@ -32,10 +29,6 @@ public class Question {
 
     public Set<Long> getAnsweredUsers() {
         return answeredUsers;
-    }
-
-    public String getQuestion() {
-        return question;
     }
 
     public void setQuestion(String question) {
@@ -50,8 +43,8 @@ public class Question {
         this.options = options;
     }
 
-    public int getId() {
-        return id;
+    @Override
+    public String toString() {
+        return question;
     }
-
 }

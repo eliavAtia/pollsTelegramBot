@@ -22,29 +22,29 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.polls = new ArrayList<>();
         this.pollOn = false;
         this.currentPoll=null;
-        Poll poll = new Poll(1);
+        Poll poll = new Poll();
         // אופציות לשאלה 1
-        Option red = new Option(1); red.setOption("אדום");
-        Option blue = new Option(2); blue.setOption("כחול");
-        Option green = new Option(3); green.setOption("ירוק");
-        Question q1 = new Question(1);
+        Option red = new Option(); red.setOption("אדום");
+        Option blue = new Option(); blue.setOption("כחול");
+        Option green = new Option(); green.setOption("ירוק");
+        Question q1 = new Question();
         q1.setQuestion("איזה צבע אתה אוהב?");
         q1.setOptions(Arrays.asList(red, blue, green));
 
         // אופציות לשאלה 2
-        Option cat = new Option(1); cat.setOption("חתול");
-        Option dog = new Option(2); dog.setOption("כלב");
-        Option fish = new Option(3); fish.setOption("דג");
+        Option cat = new Option(); cat.setOption("חתול");
+        Option dog = new Option(); dog.setOption("כלב");
+        Option fish = new Option(); fish.setOption("דג");
 
-        Question q2 = new Question(2);
+        Question q2 = new Question();
         q2.setQuestion("איזה חיה אתה אוהב?");
         q2.setOptions(Arrays.asList(cat, dog, fish));
 
         // אופציות לשאלה 3
-        Option pizza = new Option(1); pizza.setOption("פיצה");
-        Option burger = new Option(2); burger.setOption("בורגר");
-        Option salad = new Option(3); salad.setOption("סלט");
-        Question q3 = new Question(3);
+        Option pizza = new Option(); pizza.setOption("פיצה");
+        Option burger = new Option(); burger.setOption("בורגר");
+        Option salad = new Option(); salad.setOption("סלט");
+        Question q3 = new Question();
         q3.setQuestion("מה הארוחה האהובה עליך?");
         q3.setOptions(Arrays.asList(pizza, burger, salad));
 
@@ -55,7 +55,6 @@ public class TelegramBot extends TelegramLongPollingBot{
         // אפשר גם להגדיר זמן סיום לסקר אם רוצים
         poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
         poll.updateDelay();
-
         polls.add(poll);
         executePoll();
     }
@@ -76,7 +75,12 @@ public class TelegramBot extends TelegramLongPollingBot{
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
-            checkAnswers(update);
+            if(pollOn){
+                checkAnswers(update);
+            }
+            else {
+                sendMessage("The poll is already over",update.getMessage().getChatId());
+            }
         }
         else if (update.hasMessage() && update.getMessage().hasText()) {
             checkMessage(update);
@@ -91,6 +95,12 @@ public class TelegramBot extends TelegramLongPollingBot{
             execute(sendMessage);
         } catch ( TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void sendMessageToEveryone(String message){
+        for (int i = 0; i < usersChatIds.size(); i++) {
+            sendMessage(message,usersChatIds.get(i));
         }
     }
 
@@ -118,9 +128,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         String name = update.getMessage().getForwardSenderName();
         if(update.getMessage().getText().equals("/start") || update.getMessage().getText().equals("Hi") || update.getMessage().getText().equals("היי")){
             sendMessage("You have joined the polls bot community, to create a poll enter 'create poll'. ",chatId);
-            for (int i = 0; i < usersChatIds.size(); i++) {
-                sendMessage(name + " has joined the community, the community now contains " + usersChatIds.size() + " people.",usersChatIds.get(i));
-            }
+            sendMessageToEveryone(name + " has joined the community, the community now contains " + usersChatIds.size() + " people.");
             usersChatIds.add(chatId);
         }
         else {
@@ -159,6 +167,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     sleep(50000);
                     if(currentPoll!=null){
                         sendAnswersOfPoll();
+                        sendMessageToEveryone("The poll is over");
                         pollOn=false;
                         currentPoll=null;
                     }
@@ -181,16 +190,15 @@ public class TelegramBot extends TelegramLongPollingBot{
     public void createAndSendPoll(Poll poll){
         for(Question question : poll.getQuestions()){
             List<InlineKeyboardButton> buttons = new ArrayList<>();
-            int questionId = question.getId();
             for(Option option: question.getOptions()){
-                buttons.add(createButton(option,questionId));
+                buttons.add(createButton(option,question.toString()));
             }
             List<List<InlineKeyboardButton>> keyBoard = new ArrayList<>();
             keyBoard.add(buttons);
             InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
             inlineKeyboardMarkup.setKeyboard(keyBoard);
             SendMessage sendMessage = new SendMessage();
-            sendMessage.setText(question.getQuestion());
+            sendMessage.setText(question.toString());
             sendMessage.setReplyMarkup(inlineKeyboardMarkup);
             for (Long usersChatId : usersChatIds) {
                 sendMessageWithPoll(sendMessage, usersChatId);
@@ -198,9 +206,9 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
     }
 
-    private InlineKeyboardButton createButton(Option option,int questionId){
-        InlineKeyboardButton button = new InlineKeyboardButton(option.getOption());
-        button.setCallbackData(questionId+":"+option.getId());
+    private InlineKeyboardButton createButton(Option option,String question){
+        InlineKeyboardButton button = new InlineKeyboardButton(option.toString());
+        button.setCallbackData(question+":"+option.toString());
         return button;
     }
 
@@ -220,14 +228,14 @@ public class TelegramBot extends TelegramLongPollingBot{
         long chatId = callback.getFrom().getId();
         String data = callback.getData();
         String[] parts = data.split(":");
-        int questionId = Integer.parseInt(parts[0]);
-        int optionId = Integer.parseInt(parts[1]);
+        String questionText = parts[0];
+        String optionText = parts[1];
         Question question = currentPoll.getQuestions().stream()
-                .filter(q -> q.getId() == questionId)
+                .filter(q -> q.toString().equals(questionText))
                 .findFirst()
                 .orElse(null);
         if(question != null) {
-            boolean notVoted = question.addVote(optionId, chatId);
+            boolean notVoted = question.addVote(optionText, chatId);
             if (!notVoted) {
                 sendMessage("You have already voted, you cannot vote again.",chatId);
             }
@@ -245,6 +253,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
         if(pollOver){
             sendAnswersOfPoll();
+            sendMessageToEveryone("The poll is over");
             pollOn=false;
             currentPoll=null;
         }
