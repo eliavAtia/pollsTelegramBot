@@ -120,7 +120,8 @@ public class ManualScreen extends JPanel {
         List<Option> optionList=new ArrayList<>();
         int answers=0;
         for (JTextArea jTextArea:jTextAreaList){
-            if (jTextArea.getText() != null) {
+            String text=jTextArea.getText();
+            if (text!=null  ||text.trim().isEmpty()) {
                 optionList.add(newOption(jTextArea.getText()));
                 answers++;
             }
@@ -130,7 +131,8 @@ public class ManualScreen extends JPanel {
         }
         Question question=new Question();
         question.setQuestion(questionArea.getText());
-        if (questionArea.getText()==null){
+        String text=questionArea.getText();
+        if (questionArea.getText()==null||text.trim().isEmpty()){
             return;
         }
         question.setOptions(optionList);

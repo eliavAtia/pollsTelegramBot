@@ -46,6 +46,20 @@ public class ChatGPTScreen extends JPanel {
     public void buttonsBuilder(){
         ImageButton continueButton=new ImageButton("/Images/continue.png");
         continueButton.setBounds(getWidth()/2-100,180,200,200);
+        continueButton.addActionListener(e->{
+            bodek();
+        });
         this.add(continueButton);
+    }
+    public void bodek(){
+        String text=topicArea.getText();
+        if (topicArea.getText()==null||text.trim().isEmpty()){
+            return;
+        }
+        GeneratingScreen generatingScreen=new GeneratingScreen(topicArea.getText(),getX(),getY(),getWidth(),getHeight());
+        parentWindow.remove(this);
+        parentWindow.add(generatingScreen);
+        parentWindow.revalidate();
+        parentWindow.repaint();
     }
 }
