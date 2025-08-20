@@ -11,6 +11,7 @@ public class Poll {
     private int delayTimeSeconds;
     private boolean pollReady;
 
+
     public Poll() {
         pollReady=false;
     }

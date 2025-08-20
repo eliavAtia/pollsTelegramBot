@@ -71,7 +71,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
-    //פונקצית onUpdateReceived
+    //פונקציות onUpdateReceived
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasCallbackQuery()) {
@@ -113,12 +113,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             joinCommunity(update);
         }
         else {
-            if(message.trim().equals("create poll")){
-                addPoll(update);
-            }
-            else {
-                sendMessage("The message is not understood, to create a poll please enter 'create poll' .",chatId);
-            }
+            sendMessage("You cannot send messages to the bot, you can only answer polls.",chatId);
         }
 
     }
@@ -127,7 +122,7 @@ public class TelegramBot extends TelegramLongPollingBot{
         long chatId = update.getMessage().getChatId();
         String name = update.getMessage().getForwardSenderName();
         if(update.getMessage().getText().equals("/start") || update.getMessage().getText().equals("Hi") || update.getMessage().getText().equals("היי")){
-            sendMessage("You have joined the polls bot community, to create a poll enter 'create poll'. ",chatId);
+            sendMessage("Welcome, you have joined the polls bot community, there will be polls sent out and you can answer them.",chatId);
             sendMessageToEveryone(name + " has joined the community, the community now contains " + usersChatIds.size() + " people.");
             usersChatIds.add(chatId);
         }
@@ -141,14 +136,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     //פונקציות ליצירת סקר
     private void addPoll(Update update){
         long chatId = update.getMessage().getChatId();
-        if(usersChatIds.size()<3){
-            sendMessage("There are not enough people in the community.",chatId);
-            return;
-        }
-        if(pollOn){
-            sendMessage("There is a poll in progress, please wait until the poll is over.",chatId);
-            return;
-        }
+
 
     }
 
@@ -167,7 +155,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                     sleep(50000);
                     if(currentPoll!=null){
                         sendAnswersOfPoll();
-                        sendMessageToEveryone("The poll is over");
+                        sendMessageToEveryone("The current poll is over");
                         pollOn=false;
                         currentPoll=null;
                     }
@@ -188,6 +176,7 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     public void createAndSendPoll(Poll poll){
+        sendMessageToEveryone("New poll sent, please answer all questions within 5 minutes");
         for(Question question : poll.getQuestions()){
             List<InlineKeyboardButton> buttons = new ArrayList<>();
             for(Option option: question.getOptions()){
@@ -253,14 +242,19 @@ public class TelegramBot extends TelegramLongPollingBot{
         }
         if(pollOver){
             sendAnswersOfPoll();
-            sendMessageToEveryone("The poll is over");
+            sendMessageToEveryone("The current poll is over");
             pollOn=false;
             currentPoll=null;
         }
     }
 
     private void sendAnswersOfPoll(){
-
+        for(Question question:currentPoll.getQuestions()){
+            for (Option option:question.getOptions()){
+                System.out.print(option.getVotes()+" ");
+            }
+            System.out.println();
+        }
     }
 
 }
