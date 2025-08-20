@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -7,9 +8,13 @@ import java.util.Set;
 public class Question {
     private String question;
     private List<Option> options;
-    private int id;
     private Set<Long> answeredUsers = new HashSet<>();
 
+
+    public Question(String question) {
+        this.question = question;
+        this.options = new ArrayList<>();
+    }
 
     public boolean addVote(String optionText, long chatId) {
         if(answeredUsers.contains(chatId)){
@@ -45,5 +50,15 @@ public class Question {
     @Override
     public String toString() {
         return question;
+    }
+
+    public void addOption(String optionText){
+        Option option = new Option(optionText);
+        option.setQuestion(this);
+        options.add(option);
+    }
+
+    public void setAnsweredUsers(Set<Long> answeredUsers) {
+        this.answeredUsers = answeredUsers;
     }
 }

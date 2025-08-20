@@ -112,9 +112,7 @@ public class ManualScreen extends JPanel {
         this.add(continueButton);
     }
     private Option newOption(String option){
-        Option option1=new Option();
-        option1.setOption(option);
-        return option1;
+        return new Option(option);
     }
     public void buttonPressed(){
         List<Option> optionList=new ArrayList<>();
@@ -129,8 +127,7 @@ public class ManualScreen extends JPanel {
         if (answers<2){
             return;
         }
-        Question question=new Question();
-        question.setQuestion(questionArea.getText());
+        Question question=new Question(questionArea.getText());
         String text=questionArea.getText();
         if (questionArea.getText()==null||text.trim().isEmpty()){
             return;

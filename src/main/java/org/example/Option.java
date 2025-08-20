@@ -3,7 +3,17 @@ package org.example;
 public class Option {
     private int votes;
     private String option;
+    private Question question;
 
+
+    public Option(String option) {
+        this.option = option;
+        votes = 0;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
 
     public int getVotes() {
         return votes;
@@ -20,5 +30,9 @@ public class Option {
     @Override
     public String toString() {
         return option;
+    }
+
+    public int percentageOfQuestion(){
+        return (votes/question.getAnsweredUsers().size())*100;
     }
 }

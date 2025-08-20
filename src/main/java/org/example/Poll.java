@@ -30,7 +30,6 @@ public class Poll {
         scheduler.scheduleAtFixedRate(() -> {
             if(delayTimeSeconds>0){
                 delayTimeSeconds--;
-                System.out.println("-");
             }
             else {
                 pollReady = true;
@@ -49,10 +48,20 @@ public class Poll {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
+
     public void addQuestion(Question question){
         this.questions.add(question);
     }
+
     public String toString(){
-        return questions.toString();
+        StringBuilder sb = new StringBuilder();
+        for(Question question:questions){
+            sb.append("Q: ").append(question).append("\n");
+            for (Option option:question.getOptions()){
+                sb.append("option: ").append(option).append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }

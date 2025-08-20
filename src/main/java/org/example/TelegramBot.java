@@ -22,40 +22,40 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.polls = new ArrayList<>();
         this.pollOn = false;
         this.currentPoll=null;
-        Poll poll = new Poll();
-        // אופציות לשאלה 1
-        Option red = new Option(); red.setOption("אדום");
-        Option blue = new Option(); blue.setOption("כחול");
-        Option green = new Option(); green.setOption("ירוק");
-        Question q1 = new Question();
-        q1.setQuestion("איזה צבע אתה אוהב?");
-        q1.setOptions(Arrays.asList(red, blue, green));
-
-        // אופציות לשאלה 2
-        Option cat = new Option(); cat.setOption("חתול");
-        Option dog = new Option(); dog.setOption("כלב");
-        Option fish = new Option(); fish.setOption("דג");
-
-        Question q2 = new Question();
-        q2.setQuestion("איזה חיה אתה אוהב?");
-        q2.setOptions(Arrays.asList(cat, dog, fish));
-
-        // אופציות לשאלה 3
-        Option pizza = new Option(); pizza.setOption("פיצה");
-        Option burger = new Option(); burger.setOption("בורגר");
-        Option salad = new Option(); salad.setOption("סלט");
-        Question q3 = new Question();
-        q3.setQuestion("מה הארוחה האהובה עליך?");
-        q3.setOptions(Arrays.asList(pizza, burger, salad));
-
-        // הוספת כל השאלות לסקר
-        List<Question> questions = Arrays.asList(q1, q2, q3);
-        poll.setQuestions(questions);
-
-        // אפשר גם להגדיר זמן סיום לסקר אם רוצים
-        poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
-        poll.updateDelay();
-        polls.add(poll);
+//        Poll poll = new Poll();
+//        // אופציות לשאלה 1
+//        Option red = new Option(); red.setOption("אדום");
+//        Option blue = new Option(); blue.setOption("כחול");
+//        Option green = new Option(); green.setOption("ירוק");
+//        Question q1 = new Question();
+//        q1.setQuestion("איזה צבע אתה אוהב?");
+//        q1.setOptions(Arrays.asList(red, blue, green));
+//
+//        // אופציות לשאלה 2
+//        Option cat = new Option(); cat.setOption("חתול");
+//        Option dog = new Option(); dog.setOption("כלב");
+//        Option fish = new Option(); fish.setOption("דג");
+//
+//        Question q2 = new Question();
+//        q2.setQuestion("איזה חיה אתה אוהב?");
+//        q2.setOptions(Arrays.asList(cat, dog, fish));
+//
+//        // אופציות לשאלה 3
+//        Option pizza = new Option(); pizza.setOption("פיצה");
+//        Option burger = new Option(); burger.setOption("בורגר");
+//        Option salad = new Option(); salad.setOption("סלט");
+//        Question q3 = new Question();
+//        q3.setQuestion("מה הארוחה האהובה עליך?");
+//        q3.setOptions(Arrays.asList(pizza, burger, salad));
+//
+//        // הוספת כל השאלות לסקר
+//        List<Question> questions = Arrays.asList(q1, q2, q3);
+//        poll.setQuestions(questions);
+//
+//        // אפשר גם להגדיר זמן סיום לסקר אם רוצים
+//        poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
+//        poll.updateDelay();
+//        polls.add(poll);
         executePoll();
     }
 
