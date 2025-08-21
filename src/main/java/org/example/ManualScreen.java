@@ -43,7 +43,9 @@ public class ManualScreen extends JPanel {
         this.answer2=answerArea();
         this.answer3=answerArea();
         this.answer4=answerArea();
-        jTextAreaList=List.of(answer1,answer2);
+        jTextAreaList=new ArrayList<>();
+        jTextAreaList.add(answer1);
+        jTextAreaList.add(answer2);
         add(answer1);
         add(answer2);
 
@@ -100,7 +102,9 @@ public class ManualScreen extends JPanel {
             if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
                 return;
             }
-            buttonPressed();
+            if (!buttonPressed()){
+                return;
+            }
             ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll);
             parentWindow.remove(this);
             parentWindow.add(manualScreen);
@@ -109,30 +113,45 @@ public class ManualScreen extends JPanel {
         });
         ImageButton continueButton=new ImageButton("/Images/continue.png");
         continueButton.setBounds(getWidth()/2+10,250,145,145);
+        continueButton.addActionListener(e->{
+            if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
+                return;
+            }
+            if (!buttonPressed()){
+                return;
+            }
+            PollReadyScreen pollReadyScreen=new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,0);
+            parentWindow.remove(this);
+            parentWindow.add(pollReadyScreen);
+            parentWindow.revalidate();
+            parentWindow.repaint();
+        });
         this.add(continueButton);
     }
     private Option newOption(String option){
         return new Option(option);
     }
-    public void buttonPressed(){
+    public boolean buttonPressed(){
         List<Option> optionList=new ArrayList<>();
         int answers=0;
         for (JTextArea jTextArea:jTextAreaList){
             String text=jTextArea.getText();
-            if (text!=null  ||text.trim().isEmpty()) {
+            if (text!=null  &&!text.trim().isEmpty()) {
                 optionList.add(newOption(jTextArea.getText()));
                 answers++;
             }
         }
         if (answers<2){
-            return;
+            System.out.println("must enter 2 answers ");
+            return false;
         }
         Question question=new Question(questionArea.getText());
         String text=questionArea.getText();
         if (questionArea.getText()==null||text.trim().isEmpty()){
-            return;
+            return false;
         }
         question.setOptions(optionList);
         poll.addQuestion(question);
+        return true;
     }
 }

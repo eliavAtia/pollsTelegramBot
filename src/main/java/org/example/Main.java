@@ -7,6 +7,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -21,6 +22,12 @@ public class Main {
         question.addOption("פיצה");
         question.addOption("בורגר");
         question.addOption("ציפס");
+        Question question1=new Question("what is your fav color");
+        question1.addOption("red");
+        question1.addOption("blue");
+        question1.addOption("yellow");
+        Poll poll=new Poll();
+        poll.setQuestions(List.of(question1,question));
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < i; j++) {
                 question.getOptions().get(i).addVote();
@@ -30,7 +37,7 @@ public class Main {
         for(Option option: question.getOptions()){
             System.out.println(option);
         }
-        jFrame.add(new AnswersScreen(0,0,740,416,question));
+        jFrame.add(new StartingScreen(0,0,740,416,jFrame));
         jFrame.setLayout(null);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
