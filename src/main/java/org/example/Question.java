@@ -61,4 +61,7 @@ public class Question {
     public void setAnsweredUsers(Set<Long> answeredUsers) {
         this.answeredUsers = answeredUsers;
     }
+    public String getQuestion(){
+        return this.question;
+    }
 }
