@@ -23,16 +23,13 @@ public class Option {
         this.votes++;
     }
 
-    public void setOption(String option) {
-        this.option = option;
-    }
-
     @Override
     public String toString() {
         return option;
     }
 
     public int percentageOfQuestion(){
-        return (votes/question.getAnsweredUsers().size())*100;
+        float ratio = (float) (votes) /(question.getAnsweredUsers().size());
+        return (int) (ratio*100);
     }
 }

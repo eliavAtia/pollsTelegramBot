@@ -35,10 +35,6 @@ public class Question {
         return answeredUsers;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
     public List<Option> getOptions() {
         return options;
     }

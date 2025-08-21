@@ -99,15 +99,14 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
     private void sendMessageToEveryone(String message){
-        for (int i = 0; i < usersChatIds.size(); i++) {
-            sendMessage(message,usersChatIds.get(i));
+        for (Long usersChatId : usersChatIds) {
+            sendMessage(message, usersChatId);
         }
     }
 
 
     //פונקציות לבדיקת הודעה רגילה וצירוף לקהילה
     private void checkMessage(Update update){
-        String message = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
         if(!usersChatIds.contains(chatId)){
             joinCommunity(update);
@@ -133,38 +132,52 @@ public class TelegramBot extends TelegramLongPollingBot{
     }
 
 
-    //פונקציות ליצירת סקר
-    private void addPoll(Update update){
-        long chatId = update.getMessage().getChatId();
-
-
-    }
-
+    //פונקציות להרצת סקר
     private void executePoll(){
         new Thread(()->{
             while (true){
-                for (Poll value : polls) {
-                    if (value.isPollReady()) {
-                        currentPoll = value;
-                    }
+                if(!pollOn){
+                    searchPoll();
                 }
-                polls.remove(currentPoll);
-                if(currentPoll!=null){
-                    createAndSendPoll(currentPoll);
-                    pollOn = true;
-                    sleep(50000);
-                    if(currentPoll!=null){
-                        sendAnswersOfPoll();
-                        sendMessageToEveryone("The current poll is over");
-                        pollOn=false;
-                        currentPoll=null;
-                    }
-                }
-                else {
-                    sleep(1000);
+                if (pollOn) {
+                    runPoll();
                 }
             }
         }).start();
+    }
+
+    private void searchPoll(){
+        for (Poll value : polls) {
+            if (value.isPollReady()) {
+                currentPoll = value;
+                break;
+            }
+        }
+        if(currentPoll!=null){
+            polls.remove(currentPoll);
+            createAndSendPoll(currentPoll);
+            pollOn = true;
+        }
+        else {
+            sleep(1000);
+        }
+    }
+
+    private void runPoll(){
+        long startTime = System.currentTimeMillis();
+        while (true) {
+            if (System.currentTimeMillis() - startTime >= 300_000) {
+                break;
+            }
+            if (checkIfPollOver()) {
+                break;
+            }
+            sleep(100);
+        }
+        sendAnswersOfPoll();
+        sendMessageToEveryone("The current poll is over");
+        pollOn = false;
+        currentPoll = null;
     }
 
     private void sleep(int milliSeconds){
@@ -173,6 +186,17 @@ public class TelegramBot extends TelegramLongPollingBot{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+
+    //פונקציות ליצירת סקר
+    public void addPoll(Poll poll){
+        this.polls.add(poll);
+    }
+
+    public boolean thereIsEnoughPeople(){
+        return this.usersChatIds.size()>2;
     }
 
     public void createAndSendPoll(Poll poll){
@@ -197,7 +221,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private InlineKeyboardButton createButton(Option option,String question){
         InlineKeyboardButton button = new InlineKeyboardButton(option.toString());
-        button.setCallbackData(question+":"+option.toString());
+        button.setCallbackData(question+":"+option);
         return button;
     }
 
@@ -229,23 +253,15 @@ public class TelegramBot extends TelegramLongPollingBot{
                 sendMessage("You have already voted, you cannot vote again.",chatId);
             }
         }
-        checkIfPollOver();
     }
 
-    private void checkIfPollOver(){
-        boolean pollOver = true;
+    private boolean checkIfPollOver(){
         for(Question question: currentPoll.getQuestions()){
             if (question.getAnsweredUsers().size() != usersChatIds.size()) {
-                pollOver = false;
-                break;
+                return true;
             }
         }
-        if(pollOver){
-            sendAnswersOfPoll();
-            sendMessageToEveryone("The current poll is over");
-            pollOn=false;
-            currentPoll=null;
-        }
+        return false;
     }
 
     private void sendAnswersOfPoll(){

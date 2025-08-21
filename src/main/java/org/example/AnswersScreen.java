@@ -9,6 +9,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnswersScreen extends JPanel {
     private Question question;
@@ -28,7 +30,7 @@ public class AnswersScreen extends JPanel {
 
     public void labelBuilder(){
         label = new JLabel("Question: " + question);
-        label.setBounds(getWidth()/2-175,25,350,100);
+        label.setBounds(getWidth()/2-175,5,350,100);
         label.setFont(new Font("Arial", Font.BOLD, 30));
         label.setForeground(Color.white);
         add(label);
@@ -40,16 +42,21 @@ public class AnswersScreen extends JPanel {
 
     private void chartBuilder() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (Option option: question.getOptions()) {
+        List<Option> options = new ArrayList<>(question.getOptions());
+        options.sort((o1, o2) -> Double.compare(o2.percentageOfQuestion(), o1.percentageOfQuestion()));
+        for (Option option: options) {
             dataset.addValue(option.percentageOfQuestion(),"",option.toString());
         }
         JFreeChart chart = ChartFactory.createBarChart("", "options", "votes percentage", dataset);
         CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(new Color(50, 50, 50, 200));
+        plot.setDomainGridlinePaint(Color.WHITE);
+        plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
         BarRenderer renderer = (BarRenderer) plot.getRenderer();
         plot.getRangeAxis().setRange(0, 100);
-        renderer.setMaximumBarWidth(0.2);
+        renderer.setMaximumBarWidth(0.15);
         ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setBounds(75, 100, getWidth() - 200, getHeight() - 150);
+        chartPanel.setBounds(90, 90, getWidth() - 200, getHeight() - 150);
         chartPanel.setOpaque(false);
         renderer.setSeriesPaint(0, Color.BLUE);
         add(chartPanel);
