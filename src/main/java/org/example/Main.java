@@ -12,11 +12,33 @@ import java.util.List;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
+//    public static void main(String[] args) {
+//        TelegramBot bot = new TelegramBot();
+//        try {
+//            TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
+//            api.registerBot(bot);
+//        } catch (TelegramApiException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        SwingUtilities.invokeLater(() -> {
+//            JFrame jFrame = new JFrame("Poll Creator");
+//            jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//            jFrame.setBounds(100, 100, 740, 416);
+//            jFrame.setLayout(null);
+//            jFrame.setResizable(false);
+//            jFrame.setLocationRelativeTo(null);
+//            StartingScreen startingScreen = new StartingScreen(0, 0, 740, 416, bot);
+//            jFrame.add(startingScreen);
+//            jFrame.setVisible(true);
+//        });
+//    }
+
     public static void main(String[] args) {
         JFrame jFrame=new JFrame();
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         jFrame.setBounds(0,0,740,416);
-//        jFrame.add(new StartingScreen(0,0,740,416,jFrame));
+        jFrame.add(new StartingScreen(0,0,740,416,jFrame));
         Question question = new Question("מה אתה אוכל");
         question.setAnsweredUsers(new HashSet<>(Arrays.asList(10L, 20L, 30L, 40L)));
         question.addOption("פיצה");
