@@ -37,7 +37,7 @@ public class Main {
         for(Option option: question.getOptions()){
             System.out.println(option);
         }
-        jFrame.add(new StartingScreen(0,0,740,416,jFrame));
+        jFrame.add(new DelayScreen(0,0,740,416,jFrame,poll));
         jFrame.setLayout(null);
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
