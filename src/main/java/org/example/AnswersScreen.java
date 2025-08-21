@@ -28,13 +28,20 @@ public class AnswersScreen extends JPanel {
         chartBuilder();
     }
 
-    public void labelBuilder(){
-        label = new JLabel("Question: " + question);
-        label.setBounds(getWidth()/2-175,5,350,100);
-        label.setFont(new Font("Arial", Font.BOLD, 30));
+    public void labelBuilder() {
+        String text = question.toString();
+        Font font = new Font("Arial", Font.BOLD, 30);
+        label = new JLabel(text);
+        label.setFont(font);
         label.setForeground(Color.white);
+        FontMetrics metrics = getFontMetrics(font);
+        int textWidth = metrics.stringWidth(text);
+        int textHeight = metrics.getHeight();
+        int x = (getWidth() - textWidth) / 2;
+        label.setBounds(x, 15, getWidth(), textHeight);
         add(label);
     }
+
 
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);

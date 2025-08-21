@@ -7,7 +7,7 @@ public class Option {
 
 
     public Option(String option) {
-        this.option = option;
+        this.option = option.trim();
         votes = 0;
     }
 
@@ -31,5 +31,9 @@ public class Option {
     public int percentageOfQuestion(){
         float ratio = (float) (votes) /(question.getAnsweredUsers().size());
         return (int) (ratio*100);
+    }
+
+    public void setOption(String option) {
+        this.option = option;
     }
 }

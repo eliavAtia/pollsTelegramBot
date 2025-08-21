@@ -12,7 +12,7 @@ public class Question {
 
 
     public Question(String question) {
-        this.question = question;
+        this.question = question.trim();
         this.options = new ArrayList<>();
     }
 
@@ -57,7 +57,12 @@ public class Question {
     public void setAnsweredUsers(Set<Long> answeredUsers) {
         this.answeredUsers = answeredUsers;
     }
+
     public String getQuestion(){
         return this.question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
     }
 }

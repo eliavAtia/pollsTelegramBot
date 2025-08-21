@@ -1,5 +1,6 @@
 package org.example;
 
+import jdk.internal.icu.text.UnicodeSet;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -8,7 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class TelegramBot extends TelegramLongPollingBot{
     private List<Long> usersChatIds;
@@ -22,41 +26,41 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.polls = new ArrayList<>();
         this.pollOn = false;
         this.currentPoll=null;
-//        Poll poll = new Poll();
-//        // אופציות לשאלה 1
-//        Option red = new Option(); red.setOption("אדום");
-//        Option blue = new Option(); blue.setOption("כחול");
-//        Option green = new Option(); green.setOption("ירוק");
-//        Question q1 = new Question();
-//        q1.setQuestion("איזה צבע אתה אוהב?");
-//        q1.setOptions(Arrays.asList(red, blue, green));
-//
-//        // אופציות לשאלה 2
-//        Option cat = new Option(); cat.setOption("חתול");
-//        Option dog = new Option(); dog.setOption("כלב");
-//        Option fish = new Option(); fish.setOption("דג");
-//
-//        Question q2 = new Question();
-//        q2.setQuestion("איזה חיה אתה אוהב?");
-//        q2.setOptions(Arrays.asList(cat, dog, fish));
-//
-//        // אופציות לשאלה 3
-//        Option pizza = new Option(); pizza.setOption("פיצה");
-//        Option burger = new Option(); burger.setOption("בורגר");
-//        Option salad = new Option(); salad.setOption("סלט");
-//        Question q3 = new Question();
-//        q3.setQuestion("מה הארוחה האהובה עליך?");
-//        q3.setOptions(Arrays.asList(pizza, burger, salad));
-//
-//        // הוספת כל השאלות לסקר
-//        List<Question> questions = Arrays.asList(q1, q2, q3);
-//        poll.setQuestions(questions);
-//
-//        // אפשר גם להגדיר זמן סיום לסקר אם רוצים
-//        poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
-//        poll.updateDelay();
-//        polls.add(poll);
+        example();
         executePoll();
+    }
+
+    private void example(){
+        Poll poll = new Poll();
+        // אופציות לשאלה 1
+        Question q1 = new Question("איזה צבע אתה אוהב?");
+        Option red = new Option("אדום"); red.setQuestion(q1);
+        Option blue = new Option("כחול");  blue.setQuestion(q1);
+        Option green = new Option("ירוק"); green.setQuestion(q1);
+        q1.setOptions(Arrays.asList(red, blue, green));
+
+        // אופציות לשאלה 2
+        Question q2 = new Question("איזה חיה אתה אוהב?");
+        Option cat = new Option("חתול"); cat.setQuestion(q2);
+        Option dog = new Option("כלב");  dog.setQuestion(q2);
+        Option fish = new Option("דג");  fish.setQuestion(q2);
+        q2.setOptions(Arrays.asList(cat, dog, fish));
+
+        // אופציות לשאלה 3
+        Question q3 = new Question("מה הארוחה האהובה עליך?");
+        Option pizza = new Option("פיצה"); pizza.setQuestion(q3);
+        Option burger = new Option("בורגר"); burger.setQuestion(q3);
+        Option salad = new Option("סלט"); salad.setQuestion(q3);
+        q3.setOptions(Arrays.asList(pizza, burger, salad));
+
+        // הוספת כל השאלות לסקר
+        List<Question> questions = Arrays.asList(q1, q2, q3);
+        poll.setQuestions(questions);
+
+        // אפשר גם להגדיר זמן סיום לסקר אם רוצים
+        poll.setDelayTimeSeconds(1); // לדוגמה 5 דקות
+        poll.updateDelay();
+        polls.add(poll);
     }
 
 
@@ -79,7 +83,8 @@ public class TelegramBot extends TelegramLongPollingBot{
                 checkAnswers(update);
             }
             else {
-                sendMessage("The poll is already over",update.getMessage().getChatId());
+                Long chatId = update.getCallbackQuery().getMessage().getChatId();
+                sendMessage("The poll is already over", chatId);
             }
         }
         else if (update.hasMessage() && update.getMessage().hasText()) {
@@ -119,10 +124,10 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     private void joinCommunity(Update update){
         long chatId = update.getMessage().getChatId();
-        String name = update.getMessage().getForwardSenderName();
+        String name = update.getMessage().getFrom().getFirstName();
         if(update.getMessage().getText().equals("/start") || update.getMessage().getText().equals("Hi") || update.getMessage().getText().equals("היי")){
             sendMessage("Welcome, you have joined the polls bot community, there will be polls sent out and you can answer them.",chatId);
-            sendMessageToEveryone(name + " has joined the community, the community now contains " + usersChatIds.size() + " people.");
+            sendMessageToEveryone(name + " has joined the community, the community now contains " + (usersChatIds.size()+1) + " people.");
             usersChatIds.add(chatId);
         }
         else {
@@ -167,15 +172,17 @@ public class TelegramBot extends TelegramLongPollingBot{
         long startTime = System.currentTimeMillis();
         while (true) {
             if (System.currentTimeMillis() - startTime >= 300_000) {
+                sendMessageToEveryone("5 minutes have passed, the poll has closed.");
                 break;
             }
             if (checkIfPollOver()) {
+                sendMessageToEveryone("Everyone voted, the poll is over.");
                 break;
             }
             sleep(100);
         }
-        sendAnswersOfPoll();
-        sendMessageToEveryone("The current poll is over");
+        Poll pollToShow = currentPoll;
+        sendAnswersOfPoll(pollToShow);
         pollOn = false;
         currentPoll = null;
     }
@@ -252,25 +259,32 @@ public class TelegramBot extends TelegramLongPollingBot{
             if (!notVoted) {
                 sendMessage("You have already voted, you cannot vote again.",chatId);
             }
+            else {
+                sendMessage("You voted " + optionText+ " to the question " + questionText + ". you cannot change your vote.",chatId);
+            }
         }
     }
 
     private boolean checkIfPollOver(){
         for(Question question: currentPoll.getQuestions()){
             if (question.getAnsweredUsers().size() != usersChatIds.size()) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    private void sendAnswersOfPoll(){
-        for(Question question:currentPoll.getQuestions()){
-            for (Option option:question.getOptions()){
-                System.out.print(option.getVotes()+" ");
-            }
-            System.out.println();
-        }
+    private void sendAnswersOfPoll(Poll poll){
+        SwingUtilities.invokeLater(() -> {
+            JFrame jFrame = new JFrame();
+            jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            jFrame.setBounds(0, 0, 740, 416);
+            jFrame.setLayout(null);
+            jFrame.add(new AnswersScreen(0,0,740,416, poll.getQuestions().get(0)));
+            jFrame.setLocationRelativeTo(null);
+            jFrame.setVisible(true);
+            jFrame.setResizable(false);
+        });
     }
 
 }
