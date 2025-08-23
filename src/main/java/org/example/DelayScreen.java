@@ -9,6 +9,7 @@ public class DelayScreen  extends JPanel {
     private JLabel label;
     private JTextArea minutesNumber;
     private Poll poll;
+    private JSpinner spinner;
     public DelayScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll){
         this.setBounds(x,y,width,height);
         this.setVisible(true);
@@ -17,26 +18,46 @@ public class DelayScreen  extends JPanel {
         this.poll=poll;
         labelBuilder();
         jtextAreaBuilder();
+        buttonsBuilder();
     }
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
     }
     public void labelBuilder(){
-        label=new JLabel("Would you like to launch your poll in delay? ");
+        label=new JLabel("<html>Would you like to launch your poll in delay? <br>" +
+                "if so, choose in how many minutes it will be launched( use mousewheel)<br>"+"(leave it on 0 if you dont want to delay it).</html>");
         label.setForeground(Color.WHITE); // צבע טקסט
-        label.setFont(new Font("Arial", Font.BOLD, 25));
+        label.setFont(new Font("Arial", Font.BOLD, 20));
         label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setBounds(this.getWidth()/2-300,0,600,180);
+        label.setBounds(this.getWidth()/2-450,0,900,180);
         this.add(label);
     }
     public void jtextAreaBuilder(){
-        minutesNumber=new JTextArea();
-        minutesNumber=new JTextArea();
-        minutesNumber.setFont(new Font("Aharoni", Font.PLAIN, 20));
-        minutesNumber.setForeground(Color.black);// צבע טקסט
-        minutesNumber.setBackground(Color.white);
-        minutesNumber.setOpaque(true);// צבע הרקע
-        minutesNumber.setBounds(getWidth()/2-50,150,100,20);
-        this.add(minutesNumber);
+        SpinnerModel yearModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
+        JSpinner yearSpinner = new JSpinner(yearModel);
+        ((JSpinner.DefaultEditor) yearSpinner.getEditor()).getTextField().setEditable(false);
+        yearSpinner.setBounds(getWidth()/2-50,getHeight()/2-50,100,100);
+        yearSpinner.setFont(new Font("Arial",Font.BOLD,40));
+        yearSpinner.addMouseWheelListener(e -> {
+            int notches = e.getWheelRotation(); // +1 גלילה למטה, -1 גלילה למעלה
+            int current = (Integer) yearSpinner.getValue();
+            int step = (int) ((SpinnerNumberModel) yearSpinner.getModel()).getStepSize();
+            int newValue = current + step * -notches; // הפוך את הכיוון אם רוצים
+            SpinnerNumberModel model = (SpinnerNumberModel) yearSpinner.getModel();
+            // לוודא שלא יוצא מהגבולות
+            if (newValue >= (Integer) model.getMinimum() && newValue <= (Integer) model.getMaximum()) {
+                yearSpinner.setValue(newValue);
+            }
+        });
+        spinner=yearSpinner;
+        this.add(yearSpinner);
+    }
+    public void buttonsBuilder(){
+        ImageButton sendPoll=new ImageButton("/Images/sendPoll.png");
+        sendPoll.setBounds(getX()/2,getY()/2+100,100,100);
+        sendPoll.addActionListener(e -> {
+            poll.setDelayTimeSeconds((int)spinner.getValue());
+        });
+        this.add(sendPoll);
     }
 }
