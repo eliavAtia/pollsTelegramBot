@@ -16,8 +16,10 @@ public class ManualScreen extends JPanel {
     private int clicked=0;
     private Poll poll;
     private JFrame parentWindow;
+    private TelegramBot bot;
     private List<JTextArea> jTextAreaList;
-    public ManualScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll){
+
+    public ManualScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll,TelegramBot bot){
         this.setBounds(x,y,width,height);
         this.image=new ImageIcon(getClass().getResource("/Images/background.png")).getImage();
         this.setVisible(true);
@@ -25,12 +27,15 @@ public class ManualScreen extends JPanel {
         labelsBuilder();
         textAreasBuilder();
         buttonsBuilder();
+        this.bot = bot;
         this.parentWindow=parentWindow;
         this.poll=poll;
     }
+
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
     }
+
     public void textAreasBuilder(){
         questionArea=new JTextArea();
         questionArea.setFont(new Font("Aharoni", Font.PLAIN, 18));
@@ -50,6 +55,7 @@ public class ManualScreen extends JPanel {
         add(answer2);
 
     }
+
     public void labelsBuilder(){
         questionText=new JLabel("Enter your question: ");
         questionText.setForeground(Color.WHITE); // צבע טקסט
@@ -64,6 +70,7 @@ public class ManualScreen extends JPanel {
         answersText.setBounds(getWidth()/2-215,115,200,20);
         this.add(answersText);
     }
+
     public JTextArea answerArea(){
         currentAmountOfAnsweres++;
         JTextArea answerArea;
@@ -75,6 +82,7 @@ public class ManualScreen extends JPanel {
         answerArea.setBounds(getWidth()/2-200,100+40*currentAmountOfAnsweres,400,20);
         return answerArea;
     }
+
     public void buttonsBuilder(){
         ImageButton addButton =new ImageButton("/Images/add.png");
         addButton.setBounds(50,getHeight()/2-50,160,100);
@@ -105,7 +113,7 @@ public class ManualScreen extends JPanel {
             if (!buttonPressed()){
                 return;
             }
-            ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll);
+            ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,bot);
             parentWindow.remove(this);
             parentWindow.add(manualScreen);
             parentWindow.revalidate();
@@ -120,7 +128,7 @@ public class ManualScreen extends JPanel {
             if (!buttonPressed()){
                 return;
             }
-            PollReadyScreen pollReadyScreen=new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,0);
+            PollReadyScreen pollReadyScreen=new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,0,bot);
             parentWindow.remove(this);
             parentWindow.add(pollReadyScreen);
             parentWindow.revalidate();
@@ -128,9 +136,11 @@ public class ManualScreen extends JPanel {
         });
         this.add(continueButton);
     }
+
     private Option newOption(String option){
         return new Option(option);
     }
+
     public boolean buttonPressed(){
         List<Option> optionList=new ArrayList<>();
         int answers=0;

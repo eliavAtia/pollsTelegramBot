@@ -16,9 +16,12 @@ public class PollReadyScreen extends JPanel {
     private Question question;
     private JLabel questionText;
     private Poll poll;
+    private TelegramBot bot;
     private String rightUrl;
     private String leftUrl;
-    public PollReadyScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll,int index){
+
+
+    public PollReadyScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll,int index,TelegramBot bot){
         this.setBounds(x,y,width,height);
         this.parentWindow=parentWindow;
         this.index=index;
@@ -26,13 +29,16 @@ public class PollReadyScreen extends JPanel {
         this.question=poll.getQuestions().get(this.index);
         this.setLayout(null);
         this.poll=poll;
+        this.bot = bot;
         labelBuilder();
         urlBuilder();
         buttonBuilder();
     }
+
     public void paintComponent(Graphics g){
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
     }
+
     private void labelBuilder(){
         questionText=new JLabel((index+1)+". "+question.getQuestion());
         questionText.setForeground(Color.lightGray); // צבע טקסט
@@ -49,6 +55,7 @@ public class PollReadyScreen extends JPanel {
             this.add(answerText);
         }
     }
+
     private void buttonBuilder(){
         ImageButton rightButton =new ImageButton(rightUrl);
         rightButton.setBounds(getWidth()/2+120,getHeight()/2+50,160,100);
@@ -65,7 +72,7 @@ public class PollReadyScreen extends JPanel {
         ImageButton createNew=new ImageButton("/Images/createNew.png");
         createNew.setBounds(getWidth()/2-180,getHeight()/2+40,200,120);
         createNew.addActionListener(e->{
-            StartingScreen startingScreen=new StartingScreen(getX(),getY(),getWidth(),getHeight(),parentWindow);
+            StartingScreen startingScreen=new StartingScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,bot);
             parentWindow.remove(this);
             parentWindow.add(startingScreen);
             parentWindow.repaint();
@@ -76,24 +83,27 @@ public class PollReadyScreen extends JPanel {
         continueButton.setBounds(getWidth()/2-20,getHeight()/2,180,200);
         this.add(continueButton);
     }
+
     private void rightButtonClicked(){
         if (index>=poll.getQuestions().size()-1){
             return;
         }
         parentWindow.remove(this);
-        parentWindow.add(new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,index+1));
+        parentWindow.add(new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,index+1,bot));
         parentWindow.revalidate();
         parentWindow.repaint();
     }
+
     private void leftButtonClicked(){
         if (index<=0){
             return;
         }
         parentWindow.remove(this);
-        parentWindow.add(new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,index-1));
+        parentWindow.add(new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,index-1,bot));
         parentWindow.revalidate();
         parentWindow.repaint();
     }
+
     private void urlBuilder(){
         if (index<=0){
             leftUrl="/Images/grayLeft.png";

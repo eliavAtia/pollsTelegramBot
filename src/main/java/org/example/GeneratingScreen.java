@@ -57,6 +57,24 @@ public class GeneratingScreen extends JPanel {
         }
     }
 
+    private void createPoll(){
+        if(pollInText.trim().equals("Error")){
+            stop();
+            return;
+        }
+        String[] questions = pollInText.split("Q::");
+        for (String qBlock : questions) {
+            if (qBlock.isEmpty()) continue;
+            String[] parts = qBlock.split("O::");
+            Question question = new Question(parts[0]);
+            for (int i = 1; i < parts.length; i++) {
+                question.addOption(parts[i]);
+            }
+            currentPoll.addQuestion(question);
+            stop();
+        }
+    }
+
     private void runAnimation(){
         Thread animationThread = new Thread(() -> {
             int dotCount = 0;
@@ -93,24 +111,6 @@ public class GeneratingScreen extends JPanel {
 
     public void stop() {
         running = false; // עוצר את הלופ
-    }
-
-    private void createPoll(){
-        if(pollInText.trim().equals("Error")){
-            stop();
-            return;
-        }
-        String[] questions = pollInText.split("Q::");
-        for (String qBlock : questions) {
-            if (qBlock.isEmpty()) continue;
-            String[] parts = qBlock.split("O::");
-            Question question = new Question(parts[0]);
-            for (int i = 1; i < parts.length; i++) {
-                question.addOption(parts[i]);
-            }
-            currentPoll.addQuestion(question);
-            stop();
-        }
     }
 
     public Poll getCurrentPoll() {

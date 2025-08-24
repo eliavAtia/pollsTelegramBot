@@ -201,8 +201,14 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.polls.add(poll);
     }
 
-    public boolean thereIsEnoughPeople(){
-        return this.usersChatIds.size()>2;
+    public int canAddPoll(){
+        if(this.usersChatIds.size()<2){
+            return 1;
+        }
+        else if(pollOn){
+            return 2;
+        }
+        return 0;
     }
 
     public void createAndSendPoll(Poll poll){
@@ -279,7 +285,7 @@ public class TelegramBot extends TelegramLongPollingBot{
             jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             jFrame.setBounds(0, 0, 740, 416);
             jFrame.setLayout(null);
-            jFrame.add(new AnswersScreen(0,0,740,416, poll.getQuestions().get(0)));
+            jFrame.add(new AnswersScreen(0,0,740,416, poll, jFrame,0));
             jFrame.setLocationRelativeTo(null);
             jFrame.setVisible(true);
             jFrame.setResizable(false);
