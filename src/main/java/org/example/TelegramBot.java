@@ -25,7 +25,6 @@ public class TelegramBot extends TelegramLongPollingBot{
         this.polls = new ArrayList<>();
         this.pollOn = false;
         this.currentPoll=null;
-        example();
         executePoll();
     }
 
