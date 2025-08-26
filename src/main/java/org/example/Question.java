@@ -22,7 +22,7 @@ public class Question {
         }
         answeredUsers.add(chatId);
         Option option = options.stream()
-                .filter(o -> o.toString().equals(optionText))
+                .filter(o -> String.valueOf(options.indexOf(o)).equals(optionText))
                 .findFirst()
                 .orElse(null);
         if(option != null){

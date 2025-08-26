@@ -69,6 +69,7 @@ public class ChatGPTScreen extends JPanel {
     public void checksTopic(){
         String text=topicArea.getText();
         if (topicArea.getText()==null||text.trim().isEmpty()){
+            JOptionPane.showMessageDialog(parentWindow, "חובה להכניס נושא.", "שגיאה", JOptionPane.ERROR_MESSAGE);
             return;
         }
         restartChatGPT(text);

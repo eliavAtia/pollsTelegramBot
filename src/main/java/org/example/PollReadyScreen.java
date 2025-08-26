@@ -51,7 +51,7 @@ public class PollReadyScreen extends JPanel {
             answerText.setForeground(Color.WHITE); // צבע טקסט
             answerText.setFont(new Font("Arial", Font.BOLD, 25));
             answerText.setHorizontalAlignment(SwingConstants.LEFT);
-            answerText.setBounds(100,90+60*i,700,30);
+            answerText.setBounds(100,90+50*i,700,30);
             this.add(answerText);
         }
     }

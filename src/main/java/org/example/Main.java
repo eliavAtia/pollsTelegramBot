@@ -35,12 +35,14 @@ public class Main {
             createPollBtn.setBounds(75,25,150,50);
             createPollBtn.setFont(new Font("Arial", Font.BOLD, 20));
             createPollBtn.addActionListener(e -> {
-                int result = 0;
+                int result = bot.canAddPoll();
                 if (result == 1) {
                     JOptionPane.showMessageDialog(startFrame, "לא ניתן ליצור סקר – יש פחות משלושה משתמשים רשומים.", "שגיאה", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-                else if (result == 2) {
+                if (result == 2) {
                     JOptionPane.showMessageDialog(startFrame, "לא ניתן ליצור סקר – כבר קיים סקר פעיל.", "שגיאה", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
                 else {
                     JFrame pollFrame = new JFrame("יצירת סקר");

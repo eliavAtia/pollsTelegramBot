@@ -107,10 +107,13 @@ public class ManualScreen extends JPanel {
         addQuestionButton.setBounds(getWidth()/2-180,260,200,120);
         this.add(addQuestionButton);
         addQuestionButton.addActionListener(e->{
-            if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
+            int num=buttonPressed();
+            if (num==1){
+                JOptionPane.showMessageDialog(parentWindow, "חובה להכניס לפחות שתי תשובות. ", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (!buttonPressed()){
+            else if (num==2){
+                JOptionPane.showMessageDialog(parentWindow, "חובה לכתוב שאלה.", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,bot);
@@ -125,7 +128,13 @@ public class ManualScreen extends JPanel {
             if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
                 return;
             }
-            if (!buttonPressed()){
+            int num=buttonPressed();
+            if (num==1){
+                JOptionPane.showMessageDialog(parentWindow, "חובה להכניס לפחות שתי תשובות. ", "שגיאה", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if (num==2){
+                JOptionPane.showMessageDialog(parentWindow, "חובה לכתוב שאלה.", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             PollReadyScreen pollReadyScreen=new PollReadyScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,0,bot);
@@ -143,7 +152,7 @@ public class ManualScreen extends JPanel {
         return option1;
     }
 
-    public boolean buttonPressed(){
+    public int buttonPressed(){
         Question question=new Question(questionArea.getText());
         String textQuestion =questionArea.getText();
         List<Option> optionList=new ArrayList<>();
@@ -156,15 +165,15 @@ public class ManualScreen extends JPanel {
                 answers++;
             }
         }
+        if (questionArea.getText()==null|| textQuestion.trim().isEmpty()){
+            return 2;
+        }
         if (answers<2){
             System.out.println("must enter 2 answers ");
-            return false;
-        }
-        if (questionArea.getText()==null|| textQuestion.trim().isEmpty()){
-            return false;
+            return 1;
         }
         question.setOptions(optionList);
         poll.addQuestion(question);
-        return true;
+        return 0;
     }
 }

@@ -214,27 +214,38 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     public void createAndSendPoll(Poll poll){
         sendMessageToEveryone("New poll sent, please answer all questions within 5 minutes");
+
         for(Question question : poll.getQuestions()){
-            List<InlineKeyboardButton> buttons = new ArrayList<>();
-            for(Option option: question.getOptions()){
-                buttons.add(createButton(option,question.toString()));
-            }
-            List<List<InlineKeyboardButton>> keyBoard = new ArrayList<>();
-            keyBoard.add(buttons);
-            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-            inlineKeyboardMarkup.setKeyboard(keyBoard);
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setText(question.toString());
-            sendMessage.setReplyMarkup(inlineKeyboardMarkup);
             for (Long usersChatId : usersChatIds) {
+                List<InlineKeyboardButton> buttons = new ArrayList<>();
+                for(Option option: question.getOptions()){
+                    buttons.add(createButton(option, question));
+                }
+
+                List<List<InlineKeyboardButton>> keyBoard = new ArrayList<>();
+                keyBoard.add(buttons);
+                InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+                inlineKeyboardMarkup.setKeyboard(keyBoard);
+
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(usersChatId);
+                sendMessage.setText(question.toString());
+                sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+
                 sendMessageWithPoll(sendMessage, usersChatId);
             }
         }
     }
 
-    private InlineKeyboardButton createButton(Option option,String question){
+
+    private InlineKeyboardButton createButton(Option option, Question question){
         InlineKeyboardButton button = new InlineKeyboardButton(option.toString());
-        button.setCallbackData(question+":"+option);
+
+        // מזהה קצר: אינדקס השאלה + אינדקס האופציה
+        int questionIndex = currentPoll.getQuestions().indexOf(question);
+        int optionIndex = question.getOptions().indexOf(option);
+        button.setCallbackData(questionIndex + "_" + optionIndex);
+
         return button;
     }
 
@@ -252,12 +263,13 @@ public class TelegramBot extends TelegramLongPollingBot{
     private void checkAnswers(Update update){
         CallbackQuery callback = update.getCallbackQuery();
         long chatId = callback.getFrom().getId();
+        int messageId =callback.getMessage().getMessageId();
         String data = callback.getData();
-        String[] parts = data.split(":");
+        String[] parts = data.split("_");
         String questionText = parts[0];
         String optionText = parts[1];
         Question question = currentPoll.getQuestions().stream()
-                .filter(q -> q.toString().equals(questionText))
+                .filter(q -> String.valueOf(currentPoll.getQuestions().indexOf(q)).equals(questionText))
                 .findFirst()
                 .orElse(null);
         if(question != null) {
@@ -269,6 +281,7 @@ public class TelegramBot extends TelegramLongPollingBot{
                 sendMessage("You voted " + optionText+ " to the question " + questionText + ". you cannot change your vote.",chatId);
             }
         }
+        deleteMessage(chatId,messageId);
     }
 
     private boolean checkIfPollOver(){
@@ -292,5 +305,16 @@ public class TelegramBot extends TelegramLongPollingBot{
             jFrame.setResizable(false);
         });
     }
+    private void deleteMessage(long chatId, int messageId) {
+        org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage deleteMessage =
+                new org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(chatId)); // חייב להיות מחרוזת
+        deleteMessage.setMessageId(messageId);
 
+        try {
+            execute(deleteMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
 }

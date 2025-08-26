@@ -19,6 +19,7 @@ public class DelayScreen  extends JPanel {
         this.setLayout(null);
         this.poll=poll;
         this.bot = bot;
+        this.parentWindow=parentWindow;
         labelBuilder();
         jtextAreaBuilder();
         buttonsBuilder();
@@ -57,10 +58,11 @@ public class DelayScreen  extends JPanel {
     }
     public void buttonsBuilder(){
         ImageButton sendPoll=new ImageButton("/Images/sendPoll.png");
-        sendPoll.setBounds(getX()/2,getY()/2+100,100,100);
+        sendPoll.setBounds(getWidth()/2-60,getHeight()/2+60,120,80);
         sendPoll.addActionListener(e -> {
             poll.setDelayTimeSeconds((int)spinner.getValue());
             bot.addPoll(poll);
+            parentWindow.dispose();
         });
         this.add(sendPoll);
     }
