@@ -137,17 +137,22 @@ public class ManualScreen extends JPanel {
         this.add(continueButton);
     }
 
-    private Option newOption(String option){
-        return new Option(option);
+    private Option newOption(String option,Question question){
+        Option option1=new Option(option);
+        option1.setQuestion(question);
+        return option1;
     }
 
     public boolean buttonPressed(){
+        Question question=new Question(questionArea.getText());
+        String textQuestion =questionArea.getText();
         List<Option> optionList=new ArrayList<>();
         int answers=0;
         for (JTextArea jTextArea:jTextAreaList){
             String text=jTextArea.getText();
             if (text!=null  &&!text.trim().isEmpty()) {
-                optionList.add(newOption(jTextArea.getText()));
+
+                optionList.add(newOption(jTextArea.getText(),question));
                 answers++;
             }
         }
@@ -155,9 +160,7 @@ public class ManualScreen extends JPanel {
             System.out.println("must enter 2 answers ");
             return false;
         }
-        Question question=new Question(questionArea.getText());
-        String text=questionArea.getText();
-        if (questionArea.getText()==null||text.trim().isEmpty()){
+        if (questionArea.getText()==null|| textQuestion.trim().isEmpty()){
             return false;
         }
         question.setOptions(optionList);

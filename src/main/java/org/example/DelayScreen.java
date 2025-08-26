@@ -10,12 +10,15 @@ public class DelayScreen  extends JPanel {
     private JTextArea minutesNumber;
     private Poll poll;
     private JSpinner spinner;
-    public DelayScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll){
+    private TelegramBot bot;
+
+    public DelayScreen(int x,int y,int width,int height,JFrame parentWindow,Poll poll, TelegramBot bot){
         this.setBounds(x,y,width,height);
         this.setVisible(true);
         this.image=new ImageIcon(getClass().getResource("/Images/background.png")).getImage();
         this.setLayout(null);
         this.poll=poll;
+        this.bot = bot;
         labelBuilder();
         jtextAreaBuilder();
         buttonsBuilder();
@@ -57,6 +60,7 @@ public class DelayScreen  extends JPanel {
         sendPoll.setBounds(getX()/2,getY()/2+100,100,100);
         sendPoll.addActionListener(e -> {
             poll.setDelayTimeSeconds((int)spinner.getValue());
+            bot.addPoll(poll);
         });
         this.add(sendPoll);
     }

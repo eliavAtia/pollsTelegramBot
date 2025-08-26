@@ -198,6 +198,7 @@ public class TelegramBot extends TelegramLongPollingBot{
 
     //פונקציות ליצירת סקר
     public void addPoll(Poll poll){
+        poll.updateDelay();
         this.polls.add(poll);
     }
 

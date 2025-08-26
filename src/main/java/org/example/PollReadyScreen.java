@@ -81,6 +81,13 @@ public class PollReadyScreen extends JPanel {
         this.add(createNew);
         ImageButton continueButton=new ImageButton("/Images/continue.png");
         continueButton.setBounds(getWidth()/2-20,getHeight()/2,180,200);
+        continueButton.addActionListener(e->{
+            DelayScreen delayScreen=new DelayScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,bot);
+            parentWindow.remove(this);
+            parentWindow.add(delayScreen);
+            parentWindow.repaint();
+            parentWindow.revalidate();
+        });
         this.add(continueButton);
     }
 
