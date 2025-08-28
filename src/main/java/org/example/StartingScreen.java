@@ -28,7 +28,6 @@ public class StartingScreen extends JPanel {
         ImageButton manualImg=new ImageButton("/Images/Manual.png");
         manualImg.setBounds(200, 150, 120, 80); // x, y, width, height
         manualImg.addActionListener(e -> {
-            System.out.println("Manual clicked!");
             Poll poll=new Poll();
             ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,bot);
             parentWindow.remove(this);
@@ -41,7 +40,6 @@ public class StartingScreen extends JPanel {
         ImageButton chatGptButton = new ImageButton("/Images/ChatGPT.png");
         chatGptButton.setBounds(400, 152, 120, 78); // x, y, width, height
         chatGptButton.addActionListener(e -> {
-            System.out.println("ChatGPT clicked!");
             ChatGPTScreen chatGPTScreen=new ChatGPTScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,bot);
             parentWindow.remove(this);
             parentWindow.add(chatGPTScreen);

@@ -36,6 +36,7 @@ public class Main {
             createPollBtn.setFont(new Font("Arial", Font.BOLD, 20));
             createPollBtn.addActionListener(e -> {
                 int result = bot.canAddPoll();
+                result = 0;
                 if (result == 1) {
                     JOptionPane.showMessageDialog(startFrame, "לא ניתן ליצור סקר – יש פחות משלושה משתמשים רשומים.", "שגיאה", JOptionPane.ERROR_MESSAGE);
                     return;

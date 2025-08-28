@@ -16,19 +16,17 @@ public class Question {
         this.options = new ArrayList<>();
     }
 
-    public boolean addVote(String optionText, long chatId) {
+    public boolean addVote(int optionIndex, long chatId) {
         if(answeredUsers.contains(chatId)){
             return false;
         }
         answeredUsers.add(chatId);
-        Option option = options.stream()
-                .filter(o -> String.valueOf(options.indexOf(o)).equals(optionText))
-                .findFirst()
-                .orElse(null);
-        if(option != null){
+        if (optionIndex >= 0 && optionIndex < options.size()) {
+            Option option = options.get(optionIndex);
             option.addVote();
+            return true;
         }
-        return true;
+        return false;
     }
 
     public Set<Long> getAnsweredUsers() {
@@ -49,20 +47,11 @@ public class Question {
     }
 
     public void addOption(String optionText){
-        Option option = new Option(optionText);
-        option.setQuestion(this);
+        Option option = new Option(optionText,this);
         options.add(option);
-    }
-
-    public void setAnsweredUsers(Set<Long> answeredUsers) {
-        this.answeredUsers = answeredUsers;
     }
 
     public String getQuestion(){
         return this.question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
     }
 }

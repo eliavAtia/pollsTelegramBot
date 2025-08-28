@@ -10,7 +10,9 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AnswersScreen extends JPanel {
     private Poll poll;
@@ -58,10 +60,18 @@ public class AnswersScreen extends JPanel {
 
     private void chartBuilder() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<Option> options = new ArrayList<>(question.getOptions());
-        options.sort((o1, o2) -> Double.compare(o2.percentageOfQuestion(), o1.percentageOfQuestion()));
-        for (Option option: options) {
-            dataset.addValue(option.percentageOfQuestion(),"",option.toString());
+        Map<String, Integer> merged = new HashMap<>();
+        for (Option option : question.getOptions()) {
+            merged.merge(option.toString(), option.percentageOfQuestion(), Integer::sum);
+        }
+
+        // המרה לרשימה לצורך מיון
+        ArrayList<Map.Entry<String, Integer>> mergedOptions = new ArrayList<>(merged.entrySet());
+        mergedOptions.sort((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()));
+
+        // הכנסת הנתונים ל-dataset
+        for (Map.Entry<String, Integer> entry : mergedOptions) {
+            dataset.addValue(entry.getValue(), "", entry.getKey());
         }
         JFreeChart chart = ChartFactory.createBarChart("", "options", "votes percentage", dataset);
         CategoryPlot plot = chart.getCategoryPlot();

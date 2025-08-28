@@ -98,7 +98,7 @@ public class ManualScreen extends JPanel {
                 repaint();
             }
             else {
-                System.out.println("max amount of answers is 4");
+                JOptionPane.showMessageDialog(parentWindow, " יכולות להיות עד ארבע תשובות אפשרויות.", "שגיאה", JOptionPane.ERROR_MESSAGE);
             }
             clicked++;
         });
@@ -107,13 +107,17 @@ public class ManualScreen extends JPanel {
         addQuestionButton.setBounds(getWidth()/2-180,260,200,120);
         this.add(addQuestionButton);
         addQuestionButton.addActionListener(e->{
-            int num=buttonPressed();
+            int num=buttonPressed(0);
             if (num==1){
                 JOptionPane.showMessageDialog(parentWindow, "חובה להכניס לפחות שתי תשובות. ", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             else if (num==2){
                 JOptionPane.showMessageDialog(parentWindow, "חובה לכתוב שאלה.", "שגיאה", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if (num==3) {
+                JOptionPane.showMessageDialog(parentWindow, "אפשר להכניס עד שלושה שאלות. ", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             ManualScreen manualScreen=new ManualScreen(getX(),getY(),getWidth(),getHeight(),parentWindow,poll,bot);
@@ -125,10 +129,10 @@ public class ManualScreen extends JPanel {
         ImageButton continueButton=new ImageButton("/Images/continue.png");
         continueButton.setBounds(getWidth()/2+10,250,145,145);
         continueButton.addActionListener(e->{
-            if (poll.getQuestions()!=null&&poll.getQuestions().size()>=2){
+            if (poll.getQuestions()!=null&&poll.getQuestions().size()>=3){
                 return;
             }
-            int num=buttonPressed();
+            int num=buttonPressed(1);
             if (num==1){
                 JOptionPane.showMessageDialog(parentWindow, "חובה להכניס לפחות שתי תשובות. ", "שגיאה", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -146,13 +150,7 @@ public class ManualScreen extends JPanel {
         this.add(continueButton);
     }
 
-    private Option newOption(String option,Question question){
-        Option option1=new Option(option);
-        option1.setQuestion(question);
-        return option1;
-    }
-
-    public int buttonPressed(){
+    public int buttonPressed(int num){
         Question question=new Question(questionArea.getText());
         String textQuestion =questionArea.getText();
         List<Option> optionList=new ArrayList<>();
@@ -160,16 +158,17 @@ public class ManualScreen extends JPanel {
         for (JTextArea jTextArea:jTextAreaList){
             String text=jTextArea.getText();
             if (text!=null  &&!text.trim().isEmpty()) {
-
-                optionList.add(newOption(jTextArea.getText(),question));
+                optionList.add(new Option(jTextArea.getText(),question));
                 answers++;
             }
+        }
+        if(poll.getQuestions().size()>=2 && num==0){
+            return 3;
         }
         if (questionArea.getText()==null|| textQuestion.trim().isEmpty()){
             return 2;
         }
         if (answers<2){
-            System.out.println("must enter 2 answers ");
             return 1;
         }
         question.setOptions(optionList);
